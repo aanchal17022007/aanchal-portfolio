@@ -1,128 +1,28 @@
-const menuButton = document.querySelector(".menu-toggle");
-const mobileMenu = document.querySelector(".mobile-menu");
+const menu=document.querySelector('.mobile-menu');
+document.querySelector('.menu-toggle')?.addEventListener('click',()=>menu.classList.add('open'));
+document.querySelector('.menu-close')?.addEventListener('click',()=>menu.classList.remove('open'));
+document.querySelectorAll('.mobile-menu a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
 
-if (menuButton && mobileMenu) {
-  menuButton.addEventListener("click", () => {
-    mobileMenu.classList.toggle("open");
-  });
+document.addEventListener('mousemove',e=>{document.documentElement.style.setProperty('--mx',e.clientX+'px');document.documentElement.style.setProperty('--my',e.clientY+'px')});
 
-  mobileMenu.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => {
-      mobileMenu.classList.remove("open");
-    });
-  });
-}
+const modal=document.getElementById('certificateModal');
+const image=document.getElementById('certImage');
+const pdf=document.getElementById('certPdf');
+const closeModal=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');image.src='';pdf.src=''};
+document.querySelectorAll('.certificate-open').forEach(card=>card.addEventListener('click',()=>{
+  image.classList.remove('active');pdf.classList.remove('active');
+  if(card.dataset.type==='pdf'){pdf.src=card.dataset.file;pdf.classList.add('active')}
+  else{image.src=card.dataset.file;image.classList.add('active')}
+  modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+}));
+document.getElementById('modalClose')?.addEventListener('click',closeModal);
+modal?.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
-const glow = document.querySelector(".cursor-glow");
+const form=document.getElementById('contactForm');
+form?.addEventListener('submit',e=>{e.preventDefault();const data=new FormData(form);const subject=encodeURIComponent('Portfolio enquiry from '+data.get('name'));const body=encodeURIComponent('Name: '+data.get('name')+'\nEmail: '+data.get('email')+'\n\n'+data.get('message'));window.location.href=`mailto:aaru54714@gmail.com?subject=${subject}&body=${body}`});
 
-if (glow && window.matchMedia("(pointer:fine)").matches) {
-  window.addEventListener("mousemove", event => {
-    glow.style.left = `${event.clientX}px`;
-    glow.style.top = `${event.clientY}px`;
-  });
-}
-
-const revealTargets = document.querySelectorAll(
-  ".skill-card, .experience-card, .project, .training-item, .cert-card, .timeline-item, .stat, .contact-item"
-);
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("revealed");
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.12 });
-
-revealTargets.forEach(el => {
-  el.classList.add("reveal-ready");
-  observer.observe(el);
-});
-
-const revealStyle = document.createElement("style");
-revealStyle.textContent = `
-  .reveal-ready {
-    opacity: 0;
-    transform: translateY(22px);
-    transition: opacity .7s ease, transform .7s ease;
-  }
-  .reveal-ready.revealed {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-document.head.appendChild(revealStyle);
-
-const sections = document.querySelectorAll("main section[id]");
-const navLinks = document.querySelectorAll(".desktop-nav a");
-
-const sectionObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      navLinks.forEach(link => {
-        link.style.opacity = link.getAttribute("href") === `#${entry.target.id}` ? "1" : ".55";
-      });
-    }
-  });
-}, { rootMargin: "-35% 0px -55% 0px" });
-
-sections.forEach(section => sectionObserver.observe(section));
-
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener("click", event => {
-    const target = document.querySelector(anchor.getAttribute("href"));
-    if (!target) return;
-    event.preventDefault();
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-});
-
-
-// Certificate viewer
-const certificateModal = document.getElementById("certificateModal");
-const certificateImage = document.getElementById("certificateImage");
-const certificatePdf = document.getElementById("certificatePdf");
-const certificateClose = document.querySelector(".modal-close");
-
-document.querySelectorAll(".certificate-open").forEach(card => {
-  card.addEventListener("click", () => {
-    const file = card.dataset.certificate;
-    const type = card.dataset.type;
-
-    certificateImage.classList.remove("active");
-    certificatePdf.classList.remove("active");
-
-    if (type === "pdf") {
-      certificatePdf.src = file;
-      certificatePdf.classList.add("active");
-    } else {
-      certificateImage.src = file;
-      certificateImage.classList.add("active");
-    }
-
-    certificateModal.classList.add("open");
-    certificateModal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("modal-open");
-  });
-});
-
-function closeCertificate() {
-  certificateModal.classList.remove("open");
-  certificateModal.setAttribute("aria-hidden", "true");
-  certificateImage.src = "";
-  certificatePdf.src = "";
-  document.body.classList.remove("modal-open");
-}
-
-certificateClose?.addEventListener("click", closeCertificate);
-
-certificateModal?.addEventListener("click", event => {
-  if (event.target === certificateModal) closeCertificate();
-});
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && certificateModal?.classList.contains("open")) {
-    closeCertificate();
-  }
-});
+const sections=[...document.querySelectorAll('main section[id]')];
+const navLinks=[...document.querySelectorAll('.desktop-nav a')];
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+entry.target.id))}}),{rootMargin:'-35% 0px -55% 0px'});
+sections.forEach(s=>observer.observe(s));
